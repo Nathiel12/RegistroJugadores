@@ -20,7 +20,7 @@ import edu.ucne.registrojugadores.Presentation.Players.Edit.EditPlayerUiState
 
 @Composable
 fun PlayerListScreen(
-    onNavigateToEdit: (Int) -> Unit,     
+    onNavigateToEdit: (Int) -> Unit,
     onNavigateToCreate: () -> Unit,
     viewModel: ListPlayerViewModel = hiltViewModel()
 ) {
