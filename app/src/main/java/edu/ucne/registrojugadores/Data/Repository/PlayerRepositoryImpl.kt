@@ -1,7 +1,7 @@
 package edu.ucne.registrojugadores.Data.Repository
 
-import edu.ucne.registrojugadores.Data.Local.PlayerDao
-import edu.ucne.registrojugadores.Data.Local.PlayerEntity
+import edu.ucne.registrojugadores.Data.Local.Player.PlayerDao
+import edu.ucne.registrojugadores.Data.Local.Player.PlayerEntity
 import edu.ucne.registrojugadores.Data.Mapper.toEntity
 import edu.ucne.registrojugadores.Domain.Model.Player
 import edu.ucne.registrojugadores.Domain.Repository.PlayerRepository
@@ -35,6 +35,10 @@ class PlayerRepositoryImpl @Inject constructor(
 
     override suspend fun getPlayersByName(nombre: String): List<Player> {
         return playerDao.getPlayersByName(nombre).map { it.toPlayer() }
+    }
+
+    override suspend fun getAllPlayers(): List<Player> {
+        return playerDao.getAllPlayers().map { it.toPlayer() }
     }
 }
 fun PlayerEntity.toPlayer(): Player {
