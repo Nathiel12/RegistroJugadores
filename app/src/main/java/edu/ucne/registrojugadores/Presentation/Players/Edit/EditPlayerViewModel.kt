@@ -5,10 +5,10 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.ucne.registrojugadores.Domain.Model.Player
 import edu.ucne.registrojugadores.Domain.Repository.PlayerRepository
-import edu.ucne.registrojugadores.Domain.UseCase.DeletePlayerUseCase
-import edu.ucne.registrojugadores.Domain.UseCase.GetPlayerUseCase
-import edu.ucne.registrojugadores.Domain.UseCase.UpsertPlayerUseCase
-import edu.ucne.registrojugadores.Domain.UseCase.ValidatePlayerUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.DeletePlayerUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.GetPlayerUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.UpsertPlayerUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.ValidatePlayerUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

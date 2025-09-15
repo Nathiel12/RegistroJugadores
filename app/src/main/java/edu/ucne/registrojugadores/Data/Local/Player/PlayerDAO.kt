@@ -1,9 +1,10 @@
-package edu.ucne.registrojugadores.Data.Local
+package edu.ucne.registrojugadores.Data.Local.Player
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import edu.ucne.registrojugadores.Data.Local.Player.PlayerEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,4 +27,7 @@ interface PlayerDao {
 
     @Query("SELECT * FROM jugadores WHERE Nombres = :nombre")
     suspend fun getPlayersByName(nombre: String): List<PlayerEntity>
+
+    @Query("SELECT * FROM jugadores ORDER BY Nombres ASC")
+    suspend fun getAllPlayers(): List<PlayerEntity>
 }

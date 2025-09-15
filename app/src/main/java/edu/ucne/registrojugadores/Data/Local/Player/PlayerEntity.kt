@@ -1,4 +1,4 @@
-package edu.ucne.registrojugadores.Data.Local
+package edu.ucne.registrojugadores.Data.Local.Player
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
