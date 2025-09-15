@@ -3,8 +3,8 @@ package edu.ucne.registrojugadores.Presentation.Players.List
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import edu.ucne.registrojugadores.Domain.UseCase.DeletePlayerUseCase
-import edu.ucne.registrojugadores.Domain.UseCase.ObservePlayersUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.DeletePlayerUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.ObservePlayersUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
