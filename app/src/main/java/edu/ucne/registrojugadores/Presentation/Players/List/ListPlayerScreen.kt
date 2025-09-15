@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Delete // Icono para partidas
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -16,17 +16,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import edu.ucne.registrojugadores.Domain.Model.Player
-import edu.ucne.registrojugadores.Presentation.Players.Edit.EditPlayerUiState
 
 @Composable
 fun PlayerListScreen(
     onNavigateToEdit: (Int) -> Unit,
     onNavigateToCreate: () -> Unit,
+    onNavigateToPartidas: () -> Unit,
     viewModel: ListPlayerViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     PlayerListBody(
         state = state,
+        onNavigateToPartidas = onNavigateToPartidas,
         onEvent = { event ->
             when (event) {
                 is ListPlayerUiEvent.Edit -> onNavigateToEdit(event.id)
@@ -40,12 +41,15 @@ fun PlayerListScreen(
 @Composable
 private fun PlayerListBody(
     state: ListPlayerUiState,
+    onNavigateToPartidas: () -> Unit,
     onEvent: (ListPlayerUiEvent) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { onEvent(ListPlayerUiEvent.CreateNew) }) {
-                Text("+")
+            Row {
+                FloatingActionButton(onClick = { onEvent(ListPlayerUiEvent.CreateNew) }) {
+                    Text("+")
+                }
             }
         }
     ) { padding ->
@@ -113,6 +117,10 @@ private fun PlayerListBodyPreview() {
                 Player(Jugadorid = 2, Nombres = "María García", Partidas = 42)
             )
         )
-        PlayerListBody(state) {}
+        PlayerListBody(
+            state = state,
+            onNavigateToPartidas = {},
+            onEvent = {}
+        )
     }
 }
