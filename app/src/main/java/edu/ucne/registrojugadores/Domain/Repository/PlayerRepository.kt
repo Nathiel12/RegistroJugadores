@@ -14,4 +14,6 @@ interface PlayerRepository {
     suspend fun delete(id:Int)
 
     suspend fun getPlayersByName(nombre: String): List<Player>
+
+    suspend fun getAllPlayers(): List<Player>
 }

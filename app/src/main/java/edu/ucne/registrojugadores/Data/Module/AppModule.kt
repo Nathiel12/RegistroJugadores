@@ -8,8 +8,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import edu.ucne.registrojugadores.Data.Local.PlayerDao
+import edu.ucne.registrojugadores.Data.Local.Partida.PartidaDAO
+import edu.ucne.registrojugadores.Data.Local.Player.PlayerDao
+import edu.ucne.registrojugadores.Data.Repository.PartidaRepositoryImpl
 import edu.ucne.registrojugadores.Data.Repository.PlayerRepositoryImpl
+import edu.ucne.registrojugadores.Domain.Repository.Partidas.PartidaRepository
 import edu.ucne.registrojugadores.Domain.Repository.PlayerRepository
 import javax.inject.Singleton
 
@@ -37,13 +40,31 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providePartidaDao(playerDB: PlayerDB): PartidaDAO {
+        return playerDB.partidaDao()
+    }
+
+    @Provides
+    @Singleton
     fun providePlayerRepositoryImpl(playerDao: PlayerDao): PlayerRepositoryImpl {
         return PlayerRepositoryImpl(playerDao)
     }
 
     @Provides
     @Singleton
+    fun providePartidaRepositoryImpl(partidaDao: PartidaDAO): PartidaRepositoryImpl {
+        return PartidaRepositoryImpl(partidaDao)
+    }
+
+    @Provides
+    @Singleton
     fun providePlayerRepository(impl: PlayerRepositoryImpl): PlayerRepository {
+        return impl
+    }
+
+    @Provides
+    @Singleton
+    fun providePartidaRepository(impl: PartidaRepositoryImpl): PartidaRepository {
         return impl
     }
 }
