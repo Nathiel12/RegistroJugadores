@@ -6,4 +6,5 @@ sealed interface ListPartidaUiEvent {
     data object CreateNew: ListPartidaUiEvent
     data class Edit(val id: Int) : ListPartidaUiEvent
     data class ShowMessage (val message: String) : ListPartidaUiEvent
+    object NavigateToGame : ListPartidaUiEvent
 }
