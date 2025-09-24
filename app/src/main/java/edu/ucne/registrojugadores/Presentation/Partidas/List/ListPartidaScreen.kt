@@ -23,16 +23,21 @@ fun PartidaListScreen(
     onNavigateToEdit: (Int) -> Unit,
     onNavigateToCreate: () -> Unit,
     onNavigateToPlayers: () -> Unit,
+    onNavigateToGame: () -> Unit,
+    onContinueGame: (Int) -> Unit,
     viewModel: ListPartidaViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     PartidaListBody(
         state = state,
         onNavigateToPlayers = onNavigateToPlayers,
+        onNavigateToGame = onNavigateToGame,
+        onContinueGame = onContinueGame,
         onEvent = { event ->
             when (event) {
                 is ListPartidaUiEvent.Edit -> onNavigateToEdit(event.id)
                 is ListPartidaUiEvent.CreateNew -> onNavigateToCreate()
+                is ListPartidaUiEvent.NavigateToGame -> onNavigateToGame()
                 else -> viewModel.onEvent(event)
             }
         }
@@ -43,12 +48,14 @@ fun PartidaListScreen(
 private fun PartidaListBody(
     state: ListPartidaUiState,
     onNavigateToPlayers: () -> Unit,
+    onNavigateToGame: () -> Unit,
+    onContinueGame: (Int) -> Unit,
     onEvent: (ListPartidaUiEvent) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
             Row {
-                FloatingActionButton(onClick = { onEvent(ListPartidaUiEvent.CreateNew) }) {
+                FloatingActionButton(onClick = onNavigateToGame) {
                     Text("+")
                 }
             }
@@ -67,12 +74,39 @@ private fun PartidaListBody(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                items(state.partidas) { partida ->
-                    PartidaCard(
-                        partida = partida,
-                        onClick = { onEvent(ListPartidaUiEvent.Edit(partida.partidaId)) },
-                        onDelete = { onEvent(ListPartidaUiEvent.Delete(partida.partidaId)) }
-                    )
+                val partidasEnCurso = state.partidas.filter { !it.esFinalizada }
+                if (partidasEnCurso.isNotEmpty()) {
+                    item {
+                        Text(
+                            "Partidas en Curso",
+                            style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+                    items(partidasEnCurso) { partida ->
+                        PartidaCard(
+                            partida = partida,
+                            onClick = { onContinueGame(partida.partidaId) },
+                            onDelete = { onEvent(ListPartidaUiEvent.Delete(partida.partidaId)) }
+                        )
+                    }
+                }
+                val partidasFinalizadas = state.partidas.filter { it.esFinalizada }
+                if (partidasFinalizadas.isNotEmpty()) {
+                    item {
+                        Text(
+                            "Partidas Finalizadas",
+                            style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+                    items(partidasFinalizadas) { partida ->
+                        PartidaCard(
+                            partida = partida,
+                            onClick = { onEvent(ListPartidaUiEvent.Edit(partida.partidaId)) },
+                            onDelete = { onEvent(ListPartidaUiEvent.Delete(partida.partidaId)) }
+                        )
+                    }
                 }
             }
         }
@@ -85,6 +119,7 @@ private fun PartidaCard(
     onClick: (Partida) -> Unit,
     onDelete: (Int) -> Unit,
 ) {
+    val esPartidaEnCurso = !partida.esFinalizada
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -107,8 +142,8 @@ private fun PartidaCard(
                 )
 
                 Text(
-                    text = if (partida.esFinalizada) "Finalizada" else "En juego...",
-                    color = if (partida.esFinalizada) Color.Green else Color.Gray
+                    text = if (esPartidaEnCurso) "En juego..." else "Finalizada",
+                    color = if (esPartidaEnCurso) Color.Blue else Color.Green
                 )
             }
 
@@ -129,7 +164,7 @@ private fun PartidaCard(
 
             Spacer(Modifier.height(8.dp))
 
-            if (partida.esFinalizada) {
+            if (!esPartidaEnCurso) {
                 Text(
                     text = if (partida.ganadorId != null)
                         "Ganador: ${partida.ganadorId}"
@@ -146,6 +181,14 @@ private fun PartidaCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
+                if (esPartidaEnCurso) {
+                    Button(
+                        onClick = { onClick(partida) },
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text("Continuar")
+                    }
+                }
                 IconButton(onClick = { onDelete(partida.partidaId) }) {
                     Icon(Icons.Default.Delete, contentDescription = "Eliminar partida")
                 }
@@ -189,6 +232,8 @@ private fun PartidaListBodyPreview() {
         PartidaListBody(
             state = state,
             onNavigateToPlayers = {},
+            onNavigateToGame = {},
+            onContinueGame = {},
             onEvent = {}
         )
     }
