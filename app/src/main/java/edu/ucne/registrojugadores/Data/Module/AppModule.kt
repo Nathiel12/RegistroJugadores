@@ -8,10 +8,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import edu.ucne.registrojugadores.Data.Local.Logros.LogroDAO
 import edu.ucne.registrojugadores.Data.Local.Partida.PartidaDAO
 import edu.ucne.registrojugadores.Data.Local.Player.PlayerDao
+import edu.ucne.registrojugadores.Data.Repository.Logros.LogroRepositoryImpl
 import edu.ucne.registrojugadores.Data.Repository.PartidaRepositoryImpl
 import edu.ucne.registrojugadores.Data.Repository.PlayerRepositoryImpl
+import edu.ucne.registrojugadores.Domain.Repository.Logros.LogroRepository
 import edu.ucne.registrojugadores.Domain.Repository.Partidas.PartidaRepository
 import edu.ucne.registrojugadores.Domain.Repository.PlayerRepository
 import javax.inject.Singleton
@@ -46,6 +49,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideLogroDao(playerDB: PlayerDB): LogroDAO {
+        return playerDB.logroDao()
+    }
+
+    @Provides
+    @Singleton
     fun providePlayerRepositoryImpl(playerDao: PlayerDao): PlayerRepositoryImpl {
         return PlayerRepositoryImpl(playerDao)
     }
@@ -58,6 +67,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideLogroRepositoryImpl(logroDao: LogroDAO): LogroRepositoryImpl {
+        return LogroRepositoryImpl(logroDao)
+    }
+
+    @Provides
+    @Singleton
     fun providePlayerRepository(impl: PlayerRepositoryImpl): PlayerRepository {
         return impl
     }
@@ -65,6 +80,12 @@ object AppModule {
     @Provides
     @Singleton
     fun providePartidaRepository(impl: PartidaRepositoryImpl): PartidaRepository {
+        return impl
+    }
+
+    @Provides
+    @Singleton
+    fun provideLogroRepository(impl: LogroRepositoryImpl): LogroRepository {
         return impl
     }
 }
