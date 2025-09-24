@@ -12,6 +12,9 @@ class PartidaEntity (
     val jugador1Id: Int?,
     val jugador2Id: Int?,
     val ganadorId: Int?,
-    val esFinalizada: Boolean = false)
+    val esFinalizada: Boolean = false,
+    val tablero: String = "",
+    val jugadorActual: String = "X"
+)
 {}
 
