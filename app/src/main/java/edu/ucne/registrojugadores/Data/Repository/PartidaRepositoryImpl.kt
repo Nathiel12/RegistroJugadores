@@ -35,6 +35,10 @@ class PartidaRepositoryImpl @Inject constructor(
     override suspend fun delete(id: Int) {
         partidaDao.deleteById(id)
     }
+
+    override fun getPartidasEnCurso(): Flow<List<Partida>> {
+        return partidaDao.getPartidasEnCurso()
+    }
 }
 
 
