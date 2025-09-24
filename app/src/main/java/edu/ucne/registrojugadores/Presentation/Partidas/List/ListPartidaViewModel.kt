@@ -32,6 +32,8 @@ class ListPartidaViewModel @Inject constructor(
             ListPartidaUiEvent.CreateNew -> _state.update { it.copy(navigateToCreate = true) }
             is ListPartidaUiEvent.Edit ->  _state.update { it.copy(navigateToEditId = event.id) }
             is ListPartidaUiEvent.ShowMessage -> _state.update { it.copy(message = event.message) }
+            is ListPartidaUiEvent.NavigateToGame -> {
+            }
         }
     }
 
