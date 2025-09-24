@@ -12,4 +12,6 @@ interface PartidaRepository {
     suspend fun upsert(partida: Partida):Int
 
     suspend fun delete(id:Int)
+
+    fun getPartidasEnCurso(): Flow<List<Partida>>
 }
