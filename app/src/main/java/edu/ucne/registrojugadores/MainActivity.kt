@@ -17,10 +17,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import edu.ucne.registrojugadores.Presentation.Logros.Edit.EditLogroScreen
+import edu.ucne.registrojugadores.Presentation.Logros.List.ListLogroScreen
 import edu.ucne.registrojugadores.Presentation.Partidas.Edit.EditPartidaScreen
 import edu.ucne.registrojugadores.Presentation.Partidas.List.PartidaListScreen
 import edu.ucne.registrojugadores.Presentation.Players.Edit.EditPlayerScreen
 import edu.ucne.registrojugadores.Presentation.Players.List.PlayerListScreen
+import edu.ucne.registrojugadores.Presentation.Partidas.GameScreen
 import edu.ucne.registrojugadores.ui.theme.RegistroJugadoresTheme
 import kotlinx.coroutines.launch
 
@@ -41,7 +44,7 @@ class MainActivity : ComponentActivity() {
                     drawerState = drawerState,
                     drawerContent = {
                         Surface(
-                            color = MaterialTheme.colorScheme.surface, // Usa el color de superficie del tema
+                            color = MaterialTheme.colorScheme.surface,
                             modifier = Modifier.fillMaxSize()
                         ) {
                             DrawerContent(navController = navController) {
@@ -106,6 +109,12 @@ class MainActivity : ComponentActivity() {
                                         },
                                         onNavigateToPlayers = {
                                             navController.navigate("playerList")
+                                        },
+                                        onNavigateToGame = {
+                                            navController.navigate("gameScreen")
+                                        },
+                                        onContinueGame = { partidaId ->
+                                            navController.navigate("gameScreen/$partidaId")
                                         }
                                     )
                                 }
@@ -113,6 +122,39 @@ class MainActivity : ComponentActivity() {
                                 composable("editPartida/{id}") { backStackEntry ->
                                     val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
                                     EditPartidaScreen(partidaId = id)
+                                }
+
+                                composable("gameScreen") {
+                                    GameScreen(
+                                        partidaId = null
+                                    )
+                                }
+
+                                composable("gameScreen/{partidaId}") { backStackEntry ->
+                                    val partidaId = backStackEntry.arguments?.getString("partidaId")?.toIntOrNull()
+                                    GameScreen(
+                                        partidaId = partidaId
+                                    )
+                                }
+
+                                composable("logroList") {
+                                    ListLogroScreen(
+                                        onNavigateToEdit = { logroId ->
+                                            navController.navigate("editLogro/$logroId")
+                                        },
+                                        onNavigateToCreate = {
+                                            navController.navigate("editLogro/0")
+                                        }
+                                    )
+                                }
+
+                                composable("editLogro/{logroId}") { backStackEntry ->
+                                    val logroId = backStackEntry.arguments?.getString("logroId")?.toIntOrNull()
+                                    EditLogroScreen(
+                                        logroId = logroId,
+                                        onSaveComplete = { navController.popBackStack() },
+                                        onDeleteComplete = { navController.popBackStack() }
+                                    )
                                 }
                             }
                         }
@@ -164,6 +206,15 @@ fun DrawerContent(navController: NavController, onItemClick: () -> Unit) {
                 onItemClick()
             }
         )
+
+        NavigationDrawerItem(
+            label = { Text("Logros") },
+            selected = navController.currentDestination?.route == "logroList",
+            onClick = {
+                navController.navigate("logroList")
+                onItemClick()
+            }
+        )
     }
 }
 
@@ -190,6 +241,13 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.width(200.dp)
             ) {
                 Text("Registro de Partidas")
+            }
+
+            Button(
+                onClick = { navController.navigate("logroList") },
+                modifier = Modifier.width(200.dp)
+            ) {
+                Text("Logros")
             }
         }
     }
