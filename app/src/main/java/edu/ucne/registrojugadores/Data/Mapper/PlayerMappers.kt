@@ -1,6 +1,6 @@
 package edu.ucne.registrojugadores.Data.Mapper
 
-import edu.ucne.registrojugadores.Data.Local.PlayerEntity
+import edu.ucne.registrojugadores.Data.Local.Player.PlayerEntity
 import edu.ucne.registrojugadores.Domain.Model.Player
 
 fun PlayerEntity.toDomain():Player=

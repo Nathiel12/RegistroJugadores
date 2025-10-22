@@ -1,4 +1,4 @@
-package edu.ucne.registrojugadores.Domain.UseCase
+package edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase
 
 import edu.ucne.registrojugadores.Domain.Model.Player
 import edu.ucne.registrojugadores.Domain.Repository.PlayerRepository
