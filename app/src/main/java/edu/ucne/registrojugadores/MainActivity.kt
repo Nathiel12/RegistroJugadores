@@ -17,8 +17,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import edu.ucne.registrojugadores.Presentation.Api.PartidasApiList.ListPartidaApiScreen
 import edu.ucne.registrojugadores.Presentation.Logros.Edit.EditLogroScreen
 import edu.ucne.registrojugadores.Presentation.Logros.List.ListLogroScreen
+import edu.ucne.registrojugadores.Presentation.Partidas.ApiGameScreen
+import edu.ucne.registrojugadores.Presentation.Partidas.ApiPlayerSelectionScreen
 import edu.ucne.registrojugadores.Presentation.Partidas.Edit.EditPartidaScreen
 import edu.ucne.registrojugadores.Presentation.Partidas.List.PartidaListScreen
 import edu.ucne.registrojugadores.Presentation.Players.Edit.EditPlayerScreen
@@ -156,6 +159,30 @@ class MainActivity : ComponentActivity() {
                                         onDeleteComplete = { navController.popBackStack() }
                                     )
                                 }
+                                composable("apiPartidaList") {
+                                    ListPartidaApiScreen(
+                                        onNavigateToCreate = {
+                                            navController.navigate("apiGameScreen")
+                                        },
+                                        onNavigateToGame = { partidaId ->
+                                            navController.navigate("apiGameScreen/$partidaId")
+                                        }
+                                    )
+                                }
+                                composable("apiGameScreen") {
+                                    ApiGameScreen(
+                                        partidaId = null,
+                                        onNavigateBack = { navController.popBackStack() }
+                                    )
+                                }
+
+                                composable("apiGameScreen/{partidaId}") { backStackEntry ->
+                                    val partidaId = backStackEntry.arguments?.getString("partidaId")?.toIntOrNull()
+                                    ApiGameScreen(
+                                        partidaId = partidaId,
+                                        onNavigateBack = { navController.popBackStack() }
+                                    )
+                                }
                             }
                         }
                     }
@@ -208,6 +235,15 @@ fun DrawerContent(navController: NavController, onItemClick: () -> Unit) {
         )
 
         NavigationDrawerItem(
+            label = { Text("Partidas API") },
+            selected = navController.currentDestination?.route == "apiPartidaList",
+            onClick = {
+                navController.navigate("apiPartidaList")
+                onItemClick()
+            }
+        )
+
+        NavigationDrawerItem(
             label = { Text("Logros") },
             selected = navController.currentDestination?.route == "logroList",
             onClick = {
@@ -241,6 +277,13 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.width(200.dp)
             ) {
                 Text("Registro de Partidas")
+            }
+
+            Button(
+                onClick = { navController.navigate("apiPartidaList") },
+                modifier = Modifier.width(200.dp)
+            ) {
+                Text("Partidas API")
             }
 
             Button(
