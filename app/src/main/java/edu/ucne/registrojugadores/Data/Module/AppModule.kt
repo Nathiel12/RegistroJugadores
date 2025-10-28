@@ -13,16 +13,15 @@ import dagger.hilt.components.SingletonComponent
 import edu.ucne.registrojugadores.Data.Local.Logros.LogroDAO
 import edu.ucne.registrojugadores.Data.Local.Partida.PartidaDAO
 import edu.ucne.registrojugadores.Data.Local.Player.PlayerDao
+import edu.ucne.registrojugadores.Data.Remote.DataSource.JugadorRemoteDataSource
 import edu.ucne.registrojugadores.Data.Remote.JugadorApi
 import edu.ucne.registrojugadores.Data.Remote.MovimientoApi
 import edu.ucne.registrojugadores.Data.Remote.PartidaApi
-import edu.ucne.registrojugadores.Data.Repository.Api.JugadoresApiRepositoryImpl
 import edu.ucne.registrojugadores.Data.Repository.Api.MovimientoApiRepositoryImpl
 import edu.ucne.registrojugadores.Data.Repository.Api.PartidaApiRepositoryImpl
 import edu.ucne.registrojugadores.Data.Repository.Logros.LogroRepositoryImpl
 import edu.ucne.registrojugadores.Data.Repository.PartidaRepositoryImpl
 import edu.ucne.registrojugadores.Data.Repository.PlayerRepositoryImpl
-import edu.ucne.registrojugadores.Domain.Repository.Api.JugadorApiRepository
 import edu.ucne.registrojugadores.Domain.Repository.Api.MovimientoApiRepository
 import edu.ucne.registrojugadores.Domain.Repository.Api.PartidaApiRepository
 import edu.ucne.registrojugadores.Domain.Repository.Logros.LogroRepository
@@ -105,13 +104,6 @@ object AppModule {
     fun provideMovimientoApiRepository(api: MovimientoApi): MovimientoApiRepository {
         return MovimientoApiRepositoryImpl(api)
     }
-
-    @Provides
-    @Singleton
-    fun provideJugadorApiRepository(api: JugadorApi): JugadorApiRepository {
-        return JugadoresApiRepositoryImpl(api)
-    }
-
     @Provides
     @Singleton
     fun providePartidaDao(playerDB: PlayerDB): PartidaDAO {
@@ -126,8 +118,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePlayerRepositoryImpl(playerDao: PlayerDao): PlayerRepositoryImpl {
-        return PlayerRepositoryImpl(playerDao)
+    fun providePlayerRepositoryImpl(playerDao: PlayerDao, remoteDataSource: JugadorRemoteDataSource): PlayerRepository {
+        return PlayerRepositoryImpl(playerDao, remoteDataSource)
     }
 
     @Provides
@@ -140,12 +132,6 @@ object AppModule {
     @Singleton
     fun provideLogroRepositoryImpl(logroDao: LogroDAO): LogroRepositoryImpl {
         return LogroRepositoryImpl(logroDao)
-    }
-
-    @Provides
-    @Singleton
-    fun providePlayerRepository(impl: PlayerRepositoryImpl): PlayerRepository {
-        return impl
     }
 
     @Provides
