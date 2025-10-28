@@ -1,0 +1,13 @@
+package edu.ucne.registrojugadores.Domain.UseCase.ApiUseCase.JugadoresApiUseCase
+
+import edu.ucne.registrojugadores.Domain.Model.Player
+import edu.ucne.registrojugadores.Domain.Repository.PlayerRepository
+import javax.inject.Inject
+
+class GetAllJugadoresUseCase @Inject constructor(
+    private val repository: PlayerRepository
+) {
+    suspend operator fun invoke(): List<Player> {
+        return repository.getAllPlayers()
+    }
+}

@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Delete // Icono para partidas
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -16,17 +16,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import edu.ucne.registrojugadores.Domain.Model.Player
-import edu.ucne.registrojugadores.Presentation.Players.Edit.EditPlayerUiState
 
 @Composable
 fun PlayerListScreen(
-    onNavigateToEdit: (Int) -> Unit,
+    onNavigateToEdit: (String) -> Unit,
     onNavigateToCreate: () -> Unit,
+    onNavigateToPartidas: () -> Unit,
     viewModel: ListPlayerViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     PlayerListBody(
         state = state,
+        onNavigateToPartidas = onNavigateToPartidas,
         onEvent = { event ->
             when (event) {
                 is ListPlayerUiEvent.Edit -> onNavigateToEdit(event.id)
@@ -40,12 +41,32 @@ fun PlayerListScreen(
 @Composable
 private fun PlayerListBody(
     state: ListPlayerUiState,
+    onNavigateToPartidas: () -> Unit,
     onEvent: (ListPlayerUiEvent) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { onEvent(ListPlayerUiEvent.CreateNew) }) {
-                Text("+")
+            Column {
+                FloatingActionButton(
+                    onClick = { onEvent(ListPlayerUiEvent.DownloadFromApi) },
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Text("G", style = MaterialTheme.typography.bodySmall)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                FloatingActionButton(
+                    onClick = { onEvent(ListPlayerUiEvent.SyncPending) },
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Text("P", style = MaterialTheme.typography.bodySmall)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                FloatingActionButton(onClick = { onEvent(ListPlayerUiEvent.CreateNew) }) {
+                    Text("+")
+                }
             }
         }
     ) { padding ->
@@ -65,8 +86,8 @@ private fun PlayerListBody(
                 items(state.players) { player ->
                     PlayerCard(
                         player = player,
-                        onClick = { onEvent(ListPlayerUiEvent.Edit(player.Jugadorid)) },
-                        onDelete = { onEvent(ListPlayerUiEvent.Delete(player.Jugadorid)) }
+                        onClick = { onEvent(ListPlayerUiEvent.Edit(player.id)) },
+                        onDelete = { onEvent(ListPlayerUiEvent.Delete(player.id)) }
                     )
                 }
             }
@@ -78,7 +99,7 @@ private fun PlayerListBody(
 private fun PlayerCard(
     player: Player,
     onClick: (Player) -> Unit,
-    onDelete: (Int) -> Unit,
+    onDelete: (String) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -96,7 +117,7 @@ private fun PlayerCard(
                 Text(player.Nombres, style = MaterialTheme.typography.titleMedium)
                 Text("Partidas: ${player.Partidas}")
             }
-            IconButton(onClick = { onDelete(player.Jugadorid) }) {
+            IconButton(onClick = { onDelete(player.id) }) {
                 Icon(Icons.Default.Delete, contentDescription = "Eliminar")
             }
         }
@@ -109,10 +130,14 @@ private fun PlayerListBodyPreview() {
     MaterialTheme {
         val state = ListPlayerUiState(
             players = listOf(
-                Player(Jugadorid = 1, Nombres = "Juan Pérez", Partidas = 25),
-                Player(Jugadorid = 2, Nombres = "María García", Partidas = 42)
+                Player(id = "1", Nombres = "Juan Pérez", Partidas = 25),
+                Player(id = "2", Nombres = "María García", Partidas = 42)
             )
         )
-        PlayerListBody(state) {}
+        PlayerListBody(
+            state = state,
+            onNavigateToPartidas = {},
+            onEvent = {}
+        )
     }
 }

@@ -3,8 +3,11 @@ package edu.ucne.registrojugadores.Presentation.Players.List
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import edu.ucne.registrojugadores.Domain.UseCase.DeletePlayerUseCase
-import edu.ucne.registrojugadores.Domain.UseCase.ObservePlayersUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.DeletePlayerUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.DownloadPlayersUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.ObservePlayersUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.PostPendingPlayersUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.TriggerSyncUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +19,10 @@ import javax.inject.Inject
 @HiltViewModel
 class ListPlayerViewModel @Inject constructor(
     private val observePlayersUseCase: ObservePlayersUseCase,
-    private val deletePlayerUseCase: DeletePlayerUseCase
+    private val deletePlayerUseCase: DeletePlayerUseCase,
+    private val postPendingPlayersUseCase: PostPendingPlayersUseCase,
+    private val downloadPlayersUseCase: DownloadPlayersUseCase,
+    private val triggerSyncUseCase: TriggerSyncUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(ListPlayerUiState(isLoading = true))
     val state: StateFlow<ListPlayerUiState> = _state.asStateFlow()
@@ -32,6 +38,8 @@ class ListPlayerViewModel @Inject constructor(
             ListPlayerUiEvent.CreateNew -> _state.update { it.copy(navigateToCreate = true) }
             is ListPlayerUiEvent.Edit -> _state.update { it.copy(navigateToEditId = event.id) }
             is ListPlayerUiEvent.ShowMessage -> _state.update { it.copy(message = event.message) }
+            ListPlayerUiEvent.SyncPending -> onSyncPending()
+            ListPlayerUiEvent.DownloadFromApi -> onDownloadFromApi()
         }
     }
 
@@ -49,7 +57,7 @@ class ListPlayerViewModel @Inject constructor(
         }
     }
 
-    private fun onDelete(id: Int) {
+    private fun onDelete(id: String) {
         viewModelScope.launch {
             try {
                 deletePlayerUseCase(id)
@@ -57,6 +65,43 @@ class ListPlayerViewModel @Inject constructor(
             } catch (e: Exception) {
                 onEvent(ListPlayerUiEvent.ShowMessage("Error al eliminar: ${e.message}"))
             }
+        }
+    }
+
+    private fun onSyncPending() {
+        viewModelScope.launch {
+            try {
+                val success = postPendingPlayersUseCase()
+                if (success) {
+                    onEvent(ListPlayerUiEvent.ShowMessage("Jugadores pendientes sincronizados"))
+                } else {
+                    onEvent(ListPlayerUiEvent.ShowMessage("Error al sincronizar pendientes"))
+                }
+            } catch (e: Exception) {
+                onEvent(ListPlayerUiEvent.ShowMessage("Error: ${e.message}"))
+            }
+        }
+    }
+
+    private fun onDownloadFromApi() {
+        viewModelScope.launch {
+            try {
+                val success = downloadPlayersUseCase()
+                if (success) {
+                    onEvent(ListPlayerUiEvent.ShowMessage("Jugadores descargados de la API"))
+                } else {
+                    onEvent(ListPlayerUiEvent.ShowMessage("Error al descargar jugadores"))
+                }
+            } catch (e: Exception) {
+                onEvent(ListPlayerUiEvent.ShowMessage("Error: ${e.message}"))
+            }
+        }
+    }
+
+    fun triggerAutoSync() {
+        viewModelScope.launch {
+            triggerSyncUseCase()
+            onEvent(ListPlayerUiEvent.ShowMessage("Sincronización automática iniciada"))
         }
     }
 

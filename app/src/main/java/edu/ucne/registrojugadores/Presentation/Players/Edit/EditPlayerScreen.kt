@@ -15,7 +15,7 @@ import kotlin.jvm.Throws
 
 @Composable
 fun EditPlayerScreen(
-    playerId: Int?,viewModel: EditPlayerViewModel = hiltViewModel()
+    playerId: String?,viewModel: EditPlayerViewModel = hiltViewModel()
 ) {
     LaunchedEffect(playerId) {
         viewModel.onEvent(EditPlayerUiEvent.Load(playerId))

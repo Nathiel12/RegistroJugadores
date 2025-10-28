@@ -1,4 +1,4 @@
-package edu.ucne.registrojugadores.Domain.UseCase
+package edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase
 
 import edu.ucne.registrojugadores.Domain.Model.Player
 import edu.ucne.registrojugadores.Domain.Repository.PlayerRepository
@@ -7,8 +7,8 @@ import javax.inject.Inject
 class GetPlayerUseCase @Inject constructor(
     private val repository: PlayerRepository
 ) {
-    suspend operator fun invoke(id: Int): Player? {
-        if (id <= 0) throw IllegalArgumentException("El id debe ser mayor que 0")
+    suspend operator fun invoke(id: String): Player? {
+        if (id.isBlank()) throw IllegalArgumentException("El id debe ser mayor que 0")
         return repository.getPlayer(id)
     }
 }

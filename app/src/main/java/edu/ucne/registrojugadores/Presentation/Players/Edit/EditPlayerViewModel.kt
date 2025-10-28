@@ -5,33 +5,40 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.ucne.registrojugadores.Domain.Model.Player
 import edu.ucne.registrojugadores.Domain.Repository.PlayerRepository
-import edu.ucne.registrojugadores.Domain.UseCase.DeletePlayerUseCase
-import edu.ucne.registrojugadores.Domain.UseCase.GetPlayerUseCase
-import edu.ucne.registrojugadores.Domain.UseCase.UpsertPlayerUseCase
-import edu.ucne.registrojugadores.Domain.UseCase.ValidatePlayerUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.CreatePlayerLocalUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.DeletePlayerUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.GetPlayerUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.TriggerSyncUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.UpsertPlayerUseCase
+import edu.ucne.registrojugadores.Domain.UseCase.PlayersUseCase.ValidatePlayerUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class EditPlayerViewModel @Inject constructor(
     private val getPlayerUseCase: GetPlayerUseCase,
     private val upsertPlayerUseCase: UpsertPlayerUseCase,
+    private val createPlayerLocalUseCase: CreatePlayerLocalUseCase,
     private val deletePlayerUseCase: DeletePlayerUseCase,
-    private val validatePlayerUseCase: ValidatePlayerUseCase
+    private val validatePlayerUseCase: ValidatePlayerUseCase,
+    private val triggerSyncUseCase: TriggerSyncUseCase
 ) : ViewModel(){
     private val _state = MutableStateFlow(EditPlayerUiState())
     val state: StateFlow<EditPlayerUiState> = _state.asStateFlow()
+    private var currentPlayerId: String? = null
+    private var currentPlayerRemoteId: Int? = null
 
     private fun validateNombre(nombre: String) {
         viewModelScope.launch {
             val result = validatePlayerUseCase(
                 nombre = nombre,
                 partida = _state.value.partida,
-                currentPlayerId = _state.value.playerId
+                currentPlayerId = currentPlayerId
             )
 
             _state.update {
@@ -44,7 +51,7 @@ class EditPlayerViewModel @Inject constructor(
             val result = validatePlayerUseCase(
                 nombre = _state.value.nombre,
                 partida = partida,
-                currentPlayerId = _state.value.playerId
+                currentPlayerId = currentPlayerId
             )
 
             _state.update {
@@ -79,18 +86,19 @@ class EditPlayerViewModel @Inject constructor(
             EditPlayerUiEvent.Delete -> onDelete()
         }
     }
-    private fun onLoad(id: Int?) {
-        if (id == null || id == 0) {
+    private fun onLoad(id: String?) {
+        if (id == null) {
             _state.update { it.copy(isNew = true, playerId = null) }
             return
         }
         viewModelScope.launch {
             val player = getPlayerUseCase(id)
             if (player != null) {
+                currentPlayerId = player.id
+                currentPlayerRemoteId = player.remoteId
                 _state.update {
                     it.copy(
                         isNew = false,
-                        playerId = player.Jugadorid,
                         nombre = player.Nombres,
                         partida = player.Partidas
                     )
@@ -101,11 +109,10 @@ class EditPlayerViewModel @Inject constructor(
     private fun onSave() {
         viewModelScope.launch {
             val partidaInt = state.value.partida ?: return@launch
-            // Usar el UseCase para validación completa
             val validationResult = validatePlayerUseCase(
                 nombre = _state.value.nombre,
                 partida = _state.value.partida,
-                currentPlayerId = _state.value.playerId
+                currentPlayerId = currentPlayerId
             )
 
             if (!validationResult.isValid) {
@@ -122,12 +129,18 @@ class EditPlayerViewModel @Inject constructor(
             _state.update { it.copy(isSaving = true) }
             try {
                 val player = Player(
-                    Jugadorid = _state.value.playerId ?: 0,
+                    id = currentPlayerId ?: UUID.randomUUID().toString(),
+                    remoteId = if (_state.value.isNew) null else currentPlayerRemoteId,
                     Nombres = _state.value.nombre,
                     Partidas = partidaInt
                 )
 
-                upsertPlayerUseCase(player)
+                if (_state.value.isNew) {
+                    createPlayerLocalUseCase(player)
+                    //triggerSyncUseCase()
+                } else {
+                    upsertPlayerUseCase(player)
+                }
                 _state.update {
                     it.copy(
                         isSaving = false,
@@ -145,7 +158,7 @@ class EditPlayerViewModel @Inject constructor(
         }
     }
     private fun onDelete() {
-        val id = _state.value.playerId ?: return
+        val id = currentPlayerId ?: return
         viewModelScope.launch {
             _state.update { it.copy(isDeleting = true) }
             try {
