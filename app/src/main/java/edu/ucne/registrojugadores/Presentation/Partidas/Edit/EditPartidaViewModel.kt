@@ -65,7 +65,8 @@ class EditPartidaViewModel @Inject constructor(
 
     private fun onJugador1Changed(jugadorId: Int){
         viewModelScope.launch {
-            val jugador = playerRepository.getPlayer(jugadorId)
+            val jugadores = playerRepository.getAllPlayers()
+            val jugador = jugadores.find { it.remoteId == jugadorId }
             _state.update {
                 it.copy(
                     jugador1Id = jugadorId,
@@ -77,7 +78,8 @@ class EditPartidaViewModel @Inject constructor(
 
     private fun onJugador2Changed(jugadorId: Int){
         viewModelScope.launch {
-            val jugador = playerRepository.getPlayer(jugadorId)
+            val jugadores = playerRepository.getAllPlayers()
+            val jugador = jugadores.find { it.remoteId == jugadorId }
             _state.update {
                 it.copy(
                     jugador2Id = jugadorId,
