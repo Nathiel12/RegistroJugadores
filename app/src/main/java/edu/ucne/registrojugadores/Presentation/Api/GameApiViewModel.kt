@@ -73,8 +73,8 @@ class GameApiViewModel @Inject constructor(
                     val ganador = checkWinner(tablero)
                     val esEmpate = movimientos.size == 9 && ganador == null
 
-                    val jugador1 = state.value.jugadores.find { it.Jugadorid == partida.jugador1Id }
-                    val jugador2 = state.value.jugadores.find { it.Jugadorid == partida.jugador2Id }
+                    val jugador1 = state.value.jugadores.find { it.remoteId == partida.jugador1Id }
+                    val jugador2 = state.value.jugadores.find { it.remoteId == partida.jugador2Id }
 
                     _state.update { currentState ->
                         currentState.copy(
@@ -146,7 +146,7 @@ class GameApiViewModel @Inject constructor(
             return
         }
 
-        if (jugador1.Jugadorid == jugador2.Jugadorid) {
+        if (jugador1.id == jugador2.id) {
             _state.update { it.copy(message = "Los jugadores deben ser diferentes") }
             return
         }
@@ -157,8 +157,8 @@ class GameApiViewModel @Inject constructor(
                 val partida = Partida(
                     partidaId = 0,
                     fecha = LocalDate.now().toString(),
-                    jugador1Id = jugador1.Jugadorid,
-                    jugador2Id = jugador2.Jugadorid,
+                    jugador1Id = jugador1.remoteId ?: 0,
+                    jugador2Id = jugador2.remoteId ?: 0,
                     ganadorId = null,
                     esFinalizada = false,
                     tablero = "",
