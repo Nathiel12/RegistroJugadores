@@ -15,14 +15,14 @@ class ValidatePlayerUseCase @Inject constructor(
     suspend operator fun invoke(
         nombre: String,
         partida: Int?,
-        currentPlayerId: Int? = null
+        currentPlayerId: String? = null
     ): ValidationResult {
         val nombreError = when {
             nombre.isBlank() -> "El nombre es requerido"
             else -> {
                 val existingPlayers = playerRepository.getPlayersByName(nombre)
                 val isDuplicate = if (currentPlayerId != null) {
-                    existingPlayers.any { it.Jugadorid != currentPlayerId }
+                    existingPlayers.any { it.id != currentPlayerId }
                 } else {
                     existingPlayers.isNotEmpty()
                 }
