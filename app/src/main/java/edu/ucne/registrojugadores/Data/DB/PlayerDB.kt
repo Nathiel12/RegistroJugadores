@@ -10,7 +10,7 @@ import edu.ucne.registrojugadores.Data.Local.Player.PlayerEntity
 import edu.ucne.registrojugadores.Data.Local.Player.PlayerDao
 
 @Database(entities = [PlayerEntity::class, PartidaEntity::class, LogroEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = false)
 
 abstract class PlayerDB: RoomDatabase() {
