@@ -89,7 +89,7 @@ class MainActivity : ComponentActivity() {
                                             navController.navigate("editPlayer/$id")
                                         },
                                         onNavigateToCreate = {
-                                            navController.navigate("editPlayer/0")
+                                            navController.navigate("editPlayer/new")
                                         },
                                         onNavigateToPartidas = {
                                             navController.navigate("partidaList")
@@ -98,7 +98,7 @@ class MainActivity : ComponentActivity() {
                                 }
 
                                 composable("editPlayer/{id}") { backStackEntry ->
-                                    val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+                                    val id = backStackEntry.arguments?.getString("id")
                                     EditPlayerScreen(playerId = id)
                                 }
 
