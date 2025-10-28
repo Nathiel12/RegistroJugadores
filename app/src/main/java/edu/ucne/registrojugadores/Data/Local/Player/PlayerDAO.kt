@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PlayerDao {
 
-    @Query("SELECT*FROM jugadores ORDER BY Jugadorid DESC")
+    @Query("SELECT*FROM Jugadores ORDER BY id DESC")
     fun observerAll(): Flow<List<PlayerEntity>>
 
-    @Query("SELECT*FROM jugadores WHERE Jugadorid=:id")
-    suspend fun getById(id:Int): PlayerEntity?
+    @Query("SELECT*FROM Jugadores WHERE id=:id")
+    suspend fun getById(id:String): PlayerEntity?
 
     @Upsert
     suspend fun upsert(player: PlayerEntity):Long
@@ -22,12 +22,18 @@ interface PlayerDao {
     @Delete
     suspend fun delete(entity: PlayerEntity)
 
-    @Query("DELETE FROM jugadores WHERE Jugadorid=:id")
-    suspend fun deleteById(id:Int)
+    @Query("DELETE FROM Jugadores WHERE id=:id")
+    suspend fun deleteById(id:String)
 
-    @Query("SELECT * FROM jugadores WHERE Nombres = :nombre")
+    @Query("SELECT * FROM Jugadores WHERE Nombres = :nombre")
     suspend fun getPlayersByName(nombre: String): List<PlayerEntity>
 
-    @Query("SELECT * FROM jugadores ORDER BY Nombres ASC")
+    @Query("SELECT * FROM Jugadores ORDER BY Nombres ASC")
     suspend fun getAllPlayers(): List<PlayerEntity>
+
+    @Query("SELECT * FROM Jugadores WHERE isPendingCreate = 1")
+    suspend fun getPendingCreateJugadores(): List<PlayerEntity>
+
+    @Query("SELECT * FROM Jugadores WHERE remoteId = :remoteId")
+    suspend fun getByRemoteId(remoteId: Int): PlayerEntity?
 }
