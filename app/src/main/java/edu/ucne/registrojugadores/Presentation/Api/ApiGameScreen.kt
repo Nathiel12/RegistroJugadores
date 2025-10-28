@@ -168,7 +168,7 @@ fun ApiPlayerSelectionScreen(
 
         if (showDialogJugador2) {
             val availableJugadores = state.jugadores.filter {
-                it.Jugadorid != state.jugador1Seleccionado?.Jugadorid
+                it.id != state.jugador1Seleccionado?.id
             }
 
             Dialog(
